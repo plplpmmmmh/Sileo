@@ -16,7 +16,7 @@ enum Bootstrap: String, Codable {
     case procursus = "Procursus"
     case elucubratus = "Bingner/Elucubratus"
     
-    case xinaa15_strap = "Procursus/Xina"
+ 
     case electra_strap = "Electra/Chimera"
     case other_strap = "Unknown Bootstrap"
     
@@ -36,7 +36,7 @@ enum Bootstrap: String, Codable {
         case .unc0ver, .checkra1n:
             self = .elucubratus
             
-        case .odysseyra1n, .taurine, .odyssey, .fugu15, .xina15, .dopamine:
+        case .odysseyra1n, .taurine, .odyssey, .fugu15, .dopamine:
             self = .procursus
             
         case .palera1n_legacy, .palera1n_rootful, .palera1n_rootless, .bakera1n_rootful, .bakera1n_rootless:
@@ -46,8 +46,7 @@ enum Bootstrap: String, Codable {
                 self = .other_strap
             }
             
-        case .xina15_legacy:
-            self = .xinaa15_strap
+
             
         default:
             self = .other_strap
