@@ -1,51 +1,53 @@
 on:
   push:
-    branches:
-      - main
+	branches:
+	  - main
 name: Build
 jobs:
   make:
-    name: Build Sileo
-    runs-on: macos-12
-    steps:
+	name: Build Sileo
+	runs-on: macos-12
+	steps:
 
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          token: ${{ secrets.SILEO_PAT }}
-          
-      - name: Setup Procursus Bootstrap (install)
-        run: |
-          wget https://apt.procurs.us/bootstraps/big_sur/bootstrap-darwin-amd64.tar.zst
-          sudo gtar --preserve-permissions -xkf ./bootstrap-darwin-amd64.tar.zst -C /
-          echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
-          PATH=/opt/procursus/sbin:/opt/procursus/bin:$PATH sudo /opt/procursus/bin/apt update
-          sudo /opt/procursus/bin/apt -V full-upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew 
-        continue-on-error: true
-      
-      - name: Upgrade
-        run: |
-          sudo /opt/procursus/bin/apt -V upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
-    
-      - name: Upgrade and install
-        run: |
-          sudo /opt/procursus/bin/apt install zstd apt-utils ldid xz-utils bzip2 lz4 -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
-        
-      - name: Add Procursus to PATH
-        run: |
-          echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
-          
-      - name: Select Correct Xcode (14.2)
-        run: |
-          sudo xcode-select --switch /Applications/Xcode_14.2.app
-          
-      - name: Build Sileo Nightly (iphoneos-arm64)
-        run: |
-          make clean package NIGHTLY=1 DEBUG=0 ALL_BOOTSTRAPS=1 SILEO_PLATFORM=iphoneos-arm64
+	  - name: Checkout
+		uses: actions/checkout@v2
+		with:
+		  submodules: recursive
+		  token: ${{ secrets.SILEO_PAT }}
+		  
+	  - name: Setup Procursus Bootstrap (install)
+		run: |
+		  wget https://apt.procurs.us/bootstraps/big_sur/bootstrap-darwin-amd64.tar.zst
+		  sudo gtar --preserve-permissions -xkf ./bootstrap-darwin-amd64.tar.zst -C /
+		  echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
+		  PATH=/opt/procursus/sbin:/opt/procursus/bin:$PATH sudo /opt/procursus/bin/apt update
+		  sudo /opt/procursus/bin/apt -V full-upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew 
+		continue-on-error: true
+	  
+	  - name: Upgrade
+		run: |
+		  sudo /opt/procursus/bin/apt -V upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
+	
+	  - name: Upgrade and install
+		run: |
+		  sudo /opt/procursus/bin/apt install zstd apt-utils ldid xz-utils bzip2 lz4 -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
+		
+	  - name: Add Procursus to PATH
+		run: |
+		  echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
+		  
+	  - name: Select Correct Xcode (14.2)
+		run: |
+		  sudo xcode-select --switch /Applications/Xcode_14.2.app
+		  
+	  - name: Build Sileo Nightly (iphoneos-arm64)
+		run: |
+		  make clean package NIGHTLY=1 DEBUG=0 ALL_BOOTSTRAPS=1 SILEO_PLATFORM=iphoneos-arm64
 
       - name: Upload Latest Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: sileo_build
-          path: ./*.deb
+	  id: dopamine-latest-upload
+	  uses: actions/upload-artifact@main
+	  with:
+		name: 00Dopamine_whitelist_${{ env.newVERSION }}_${{ env.msT }}_${{ env.SHASH }}
+		path: |
+		  *.deb
