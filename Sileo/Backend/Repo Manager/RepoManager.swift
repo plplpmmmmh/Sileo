@@ -524,7 +524,7 @@ final class RepoManager {
         var color: UIColor {
             switch self {
             case .error:
-                return UIColor(red: 219/255, green: 44/255, blue: 56/255, alpha: 1)
+                return UIColor(red: 199/255, green: 145/255, blue: 143/255, alpha: 1)
             case .warning:
                 return UIColor(red: 1, green: 231/255, blue: 146/255, alpha: 1)
             }
