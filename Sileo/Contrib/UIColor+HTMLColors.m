@@ -618,7 +618,7 @@ static NSDictionary *CMRW3CNamedColors() {
             @"DarkOliveGreen" : @"#556B2F",
             @"DarkOrange" : @"#FF8C00",
             @"DarkOrchid" : @"#9932CC",
-            @"DarkRed" : @"#8B0000",
+            @"DarkRed" : @"#DB8787",
             @"DarkSalmon" : @"#E9967A",
             @"DarkSeaGreen" : @"#8FBC8F",
             @"DarkSlateBlue" : @"#483D8B",
