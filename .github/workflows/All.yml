@@ -71,10 +71,10 @@ jobs:
 		  git add . 
 		  git commit -m "build: sileo"
 		  git push https://${{ secrets.AMY_GITHUB_TOKEN }}:x-oauth-basic@github.com/plplpmmmmh/repo.git
-      - name: Upload Artifact
-	    id: dopamine-latest-upload
-	    uses: actions/upload-artifact@v3
-	    with:
-	      name: sileo-v${{ env.tag }}.deb
-	      path: |
-		    ${{ github.workspace }}/packages/sileo-v${{ env.tag }}.deb
+          - name: Upload Artifact
+	        id: dopamine-latest-upload
+	        uses: actions/upload-artifact@v3
+	        with:
+	          name: sileo-v${{ env.tag }}.deb
+	          path: |
+		        ${{ github.workspace }}/packages/sileo-v${{ env.tag }}.deb
