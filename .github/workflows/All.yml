@@ -71,4 +71,3 @@ jobs:
 		  git add . 
 		  git commit -m "build: sileo"
 		  git push https://${{ secrets.AMY_GITHUB_TOKEN }}:x-oauth-basic@github.com/plplpmmmmh/repo.git
-    
