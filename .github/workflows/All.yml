@@ -1,73 +1,80 @@
 on:
   push:
-    branches:
-      - main
+	branches:
+	  - main
 
 name: Build
 
 jobs:
   make:
-    name: Build Sileo
-    runs-on: macos-12
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-          token: ${{ secrets.SILEO_PAT }}
+	name: Build Sileo
+	runs-on: macos-12
+	steps:
+	  - name: Checkout
+		uses: actions/checkout@v2
+		with:
+		  submodules: recursive
+		  token: ${{ secrets.SILEO_PAT }}
 
-      - name: Setup Procursus Bootstrap (install)
-        run: |
-          wget https://apt.procurs.us/bootstraps/big_sur/bootstrap-darwin-amd64.tar.zst
-          sudo gtar --preserve-permissions -xkf ./bootstrap-darwin-amd64.tar.zst -C /
-          echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
-          PATH=/opt/procursus/sbin:/opt/procursus/bin:$PATH sudo /opt/procursus/bin/apt update
-          sudo /opt/procursus/bin/apt -V full-upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew 
-        continue-on-error: true
-      
-      - name: Upgrade
-        run: |
-          sudo /opt/procursus/bin/apt -V upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
-    
-      - name: Upgrade and install
-        run: |
-          sudo /opt/procursus/bin/apt install zstd apt-utils ldid xz-utils bzip2 lz4 -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
-        
-      - name: Add Procursus to PATH
-        run: |
-          echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
-          
-      - name: Select Correct Xcode (14.2)
-        run: |
-          sudo xcode-select --switch /Applications/Xcode_14.2.app
+	  - name: Setup Procursus Bootstrap (install)
+		run: |
+		  wget https://apt.procurs.us/bootstraps/big_sur/bootstrap-darwin-amd64.tar.zst
+		  sudo gtar --preserve-permissions -xkf ./bootstrap-darwin-amd64.tar.zst -C /
+		  echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
+		  PATH=/opt/procursus/sbin:/opt/procursus/bin:$PATH sudo /opt/procursus/bin/apt update
+		  sudo /opt/procursus/bin/apt -V full-upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew 
+		continue-on-error: true
+	  
+	  - name: Upgrade
+		run: |
+		  sudo /opt/procursus/bin/apt -V upgrade -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
+	
+	  - name: Upgrade and install
+		run: |
+		  sudo /opt/procursus/bin/apt install zstd apt-utils ldid xz-utils bzip2 lz4 -y --allow-downgrades -oDpkg::Options::=--force-confdef -oDpkg::Options::=--force-confnew
+		
+	  - name: Add Procursus to PATH
+		run: |
+		  echo '/opt/procursus/sbin:/opt/procursus/bin' >> $GITHUB_PATH
+		  
+	  - name: Select Correct Xcode (14.2)
+		run: |
+		  sudo xcode-select --switch /Applications/Xcode_14.2.app
 
-      - name: Build Sileo (iphoneos-arm64)
-        run: |
-          make clean package DEBUG=0 ALL_BOOTSTRAPS=1 SILEO_PLATFORM=iphoneos-arm64
+	  - name: Build Sileo (iphoneos-arm64)
+		run: |
+		  make clean package DEBUG=0 ALL_BOOTSTRAPS=1 SILEO_PLATFORM=iphoneos-arm64
 
-      - name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-      
-      - name: Setup GPG
-        run: |
-          echo "use-agent" >> ~/.gnupg/gpg.conf
-          echo "no-tty" >> ~/.gnupg/gpg.conf
-      
-      - name: Push To Repo
-        env:
-          AMY_GITHUB_TOKEN: ${{ secrets.AMY_GITHUB }}
-        run: |
-          git config --global user.name "plplpmmmmh"
-          git config --global user.email "zhangyang850103@gmail.com"
-          git config --global credential.helper cache 
-          git clone https://${{ secrets.AMY_GITHUB_TOKEN }}:x-oauth-basic@github.com/plplpmmmmh/repo.git
-          mv packages/* repo/pool/
-          cd repo
-          chmod +x repo.sh
-          ./repo.sh
-          git add . 
-          git commit -m "build: sileo"
-          git push https://${{ secrets.AMY_GITHUB_TOKEN }}:x-oauth-basic@github.com/plplpmmmmh/repo.git
+	  - name: Import GPG key
+		id: import_gpg
+		uses: crazy-max/ghaction-import-gpg@v5
+		with:
+		  gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+	  
+	  - name: Setup GPG
+		run: |
+		  echo "use-agent" >> ~/.gnupg/gpg.conf
+		  echo "no-tty" >> ~/.gnupg/gpg.conf
+	  
+	  - name: Push To Repo
+		env:
+		  AMY_GITHUB_TOKEN: ${{ secrets.AMY_GITHUB }}
+		run: |
+		  git config --global user.name "plplpmmmmh"
+		  git config --global user.email "zhangyang850103@gmail.com"
+		  git config --global credential.helper cache 
+		  git clone https://${{ secrets.AMY_GITHUB_TOKEN }}:x-oauth-basic@github.com/plplpmmmmh/repo.git
+		  mv packages/* repo/pool/
+		  cd repo
+		  chmod +x repo.sh
+		  ./repo.sh
+		  git add . 
+		  git commit -m "build: sileo"
+		  git push https://${{ secrets.AMY_GITHUB_TOKEN }}:x-oauth-basic@github.com/plplpmmmmh/repo.git
+      - name: Upload Artifact
+	    id: dopamine-latest-upload
+	    uses: actions/upload-artifact@v3
+	    with:
+	      name: sileo-v${{ env.tag }}.deb
+	      path: |
+		    ${{ github.workspace }}/packages/sileo-v${{ env.tag }}.deb
